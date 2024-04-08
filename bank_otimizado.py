@@ -58,9 +58,10 @@ def exibir_extrato(saldo, /, *, extrato):
     print(f'\nSaldo: R$ {saldo:.2f}')
     print("============================================================")
     return None
+
 def criar_usuario(usuarios):
     cpf = input("Informe o CPF (somente números): ")
-    usuario = filtrat_usuario(cpf, usuarios)
+    usuario = filtrar_usuario(cpf, usuarios)
 
     if usuario:
         print("\n Já existe um usuário com o CPF informado!")
@@ -74,13 +75,14 @@ def criar_usuario(usuarios):
         
         print("=== Usuário criado com sucesso! ===")
         return None
-def filtrat_usuario(cpf,usuarios):
+    
+def filtrar_usuario(cpf,usuarios):
     usuarios_filtrados = [usuario for usuario in usuarios if usuario["cpf"] == cpf]
     return usuarios_filtrados[0] if usuarios_filtrados else None
 
 def criar_conta(agencia, numero_conta, usuarios):
     cpf = input("Informe o CPF do usuário: ")
-    usuario = filtrat_usuario(cpf, usuarios)
+    usuario = filtrar_usuario(cpf, usuarios)
     
     if usuario:
         print("\n === Conta criada com sucesso! ===")
