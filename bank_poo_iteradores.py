@@ -1,9 +1,9 @@
 #Esté script é foi desenvolvido para um atividade para um bootcamp da DIO
 #Este é um script de Banco usando poo, uma atualização do código de banco "bank_otimizado.py" com as funções
 #de depositar, sarcar, ver o extrato de ações realizadas, criar novas contas ou usuários, listar e filtrar contas.
-# fazendo uso de iteradores, decoradores e geradores, para retonar a data e hora das operações
+# fazendo uso de iteradores, decoradores, geradores e datetime para retonar a data e hora das operações
 
-from abc import ABC, abstractclassmethod, abstractproperty
+from abc import ABC, abstractproperty
 from datetime import datetime
 import textwrap
 
@@ -19,7 +19,7 @@ class Cliente:
         if len(conta.historico.transacoes_por_dia()) >= 10:
             print("Você atingiu o limite de transações permitidas por dia!")
             return 
-            
+                
         transacao.registrar(conta)
         
     def adicionar_conta(self, conta):
@@ -183,8 +183,29 @@ class Deposito(Transacao):
         
         if transacao_sucedida:
             conta.historico.adicionar_transacao(self)
- 
 
+class ContadorDeContas:
+    def __init__(self, contas):
+        self.contas = contas
+        self._contador = 0
+        
+    def __init__(self):
+        return self
+    
+    def __next__(self):
+        try:
+            conta = self.contas[self._contador]
+            return f"""
+            Agencia:\t{conta.agencia}
+            C/C:\t{conta.numero}
+            Titular\t{conta.cliente.nome}
+            Saldo: R$ {conta.saldo:.2f}
+            """ 
+        except IndexError:
+            raise StopIteration
+        finally:
+            self._contador += 1
+            
 #Definindo funções         
 def menu():
     menu = """
@@ -204,9 +225,7 @@ def menu():
 def log_transacao(funcao):
     def wrapper(*args, **kwargs):
         resultado = funcao(*args, **kwargs)
-        # Registre a transação em um arquivo de log
-        with open('transacoes.log', 'a') as file:
-            file.write(f'Transação realizada em {datetime.now()}: {funcao.__name__}\n')
+        print(f'{datetime.now()}: {funcao.__name__.upper()}')
         return resultado
     return wrapper
 
@@ -290,7 +309,7 @@ def criar_cliente(clientes):
     else:
         print("Já existe um usuário com o CPF informado!")
         return None
-@log_transacao
+    
 def filtrar_cliente(cpf,clientes):
     clientes_filtrados = [cliente for cliente in clientes if cliente.cpf == cpf]
     return clientes_filtrados[0] if clientes_filtrados else None
@@ -344,9 +363,7 @@ def main():
             exibir_extrato(clientes)
             
         elif opcao == 'nu':
-            novo_cliente = criar_cliente(clientes)
-            if novo_cliente:  # Verificar se um cliente válido foi retornado
-                clientes.append(novo_cliente) 
+            criar_cliente(clientes)
                   
         elif opcao == "nc":
             numero_conta = len(contas)+1
